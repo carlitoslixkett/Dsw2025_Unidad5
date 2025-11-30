@@ -1,19 +1,13 @@
-import { useContext } from 'react';
-import { AuthContext } from '../context/AuthProvider';
+// src/modules/auth/hook/useAuth.js
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthProvider";
 
-const useAuth = () => {
+export default function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
-    new Error('useAuth no debe ser usado por fuera de AuthProvider');
+    throw new Error("useAuth debe usarse dentro de AuthProvider");
   }
 
-  return {
-    isAuthenticated: context.isAuthenticated,
-    singin: context.singin,
-    singout: context.singout,
-  };
-
-};
-
-export default useAuth;
+  return context;
+}
