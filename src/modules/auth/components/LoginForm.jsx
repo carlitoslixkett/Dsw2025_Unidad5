@@ -16,17 +16,20 @@ function LoginForm() {
 
   const navigate = useNavigate();
 
-  const { singin } = useAuth();
+const { signin } = useAuth();
 
   const onValid = async (formData) => {
+    console.log("Enviando datos:", formData.username, formData.password);
     try {
-      const { error } = await singin(formData.username, formData.password);
+      const { error } = await signin(formData.username, formData.password);
+      console.log("signin ejecutado");
 
       if (error) {
         setErrorMessage(error.frontendErrorMessage);
 
         return;
       }
+console.log("🔹 Login ok, entrando como:", formData.username);
 
       navigate('/admin/home');
     } catch (error) {

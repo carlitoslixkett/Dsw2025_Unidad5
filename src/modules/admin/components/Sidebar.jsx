@@ -1,5 +1,6 @@
 // src/modules/admin/components/Sidebar.jsx
 import React from 'react';
+import { UserPlusIcon } from '@heroicons/react/24/outline';
 import { NavLink } from 'react-router-dom';
 import { HomeIcon, ShoppingBagIcon, ArchiveBoxIcon, ArrowLeftEndOnRectangleIcon } from '@heroicons/react/24/outline';
 import useAuth from '../../auth/hook/useAuth'; 
@@ -8,6 +9,8 @@ const navigation = [
   { name: 'Inicio', href: '/admin/home', icon: HomeIcon },
   { name: 'Productos', href: '/admin/products', icon: ShoppingBagIcon },
   { name: 'Órdenes', href: '/admin/orders', icon: ArchiveBoxIcon },
+  { name: 'Crear Usuario',href: '/admin/create-user',icon: UserPlusIcon,},
+
 ];
 
 function Sidebar() {

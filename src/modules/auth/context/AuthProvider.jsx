@@ -1,4 +1,6 @@
 // src/modules/auth/context/AuthProvider.jsx
+import { jwtDecode } from "jwt-decode";
+
 import React, { createContext, useEffect, useState } from "react";
 import { login as loginService } from "../services/login";
 
@@ -24,22 +26,46 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // 🔐 LOGIN
   const signin = async (username, password) => {
-    const { token, user, error } = await loginService(username, password);
 
-    if (error) return { error };
+  const { token, error } = await loginService(username, password);
 
-    // Guardar token + usuario
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+  if (error) return { error };
 
-    setToken(token);
-    setUser(user);
-    setIsAuthenticated(true);
+  // Decodificar token para obtener el rol y el usuario
+const decoded = jwtDecode(token);
 
-    return { error: null };
-  };
+const role =
+  decoded["role"] ||
+  decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+const userName =
+  decoded["sub"] ||
+  decoded["name"] ||
+  decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+
+const userData = {
+  username: userName,
+  role: role?.toLowerCase(),  // 🔥 NORMALIZAMOS EL ROL SIEMPRE
+};
+
+
+  // Guardar token + usuario en localStorage
+  localStorage.setItem("token", token);
+  localStorage.setItem("user", JSON.stringify(userData));
+
+  // Guardar en estado global
+  setToken(token);
+  setUser(userData);
+  setIsAuthenticated(true);
+
+console.log("🔹 Token recibido:", token);
+console.log("🔹 Decoded:", decoded);
+console.log("🔹 Rol procesado:", role?.toLowerCase());
+
+  return { error: null };
+};
+
 
   // 🔓 LOGOUT
   const logout = () => {
@@ -65,4 +91,6 @@ export function AuthProvider({ children }) {
       {!loading && children}
     </AuthContext.Provider>
   );
+
+  
 }

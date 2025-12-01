@@ -1,22 +1,24 @@
-// src/modules/auth/components/ProtectedRoute.jsx
-
 import { Navigate } from "react-router-dom";
 import useAuth from "../hook/useAuth";
 
-function ProtectedRoute({ children, role }) {
-  const { isAuthenticated, user } = useAuth();
+export default function ProtectedRoute({ role, children }) {
+  const { isAuthenticated, user, loading } = useAuth();
 
-  // Si no inició sesión → al login
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  // ⏳ Mientras AuthProvider carga datos
+  if (loading) return <div>Cargando...</div>;
 
-  // Si la ruta requiere un rol específico
-  if (role && user?.role !== role) {
-    return <Navigate to="/" replace />;
-  }
+  // ⛔ No autenticado → Login
+  if (!isAuthenticated) return <Navigate to="/login" />;
 
-  return children;
+  // ⛔ No tiene el rol → Home cliente
+if (role && user?.role?.toLowerCase() !== role.toLowerCase()) {
+    console.log("ROL NO COINCIDE → Redirigiendo", user.role, "vs", role);
+    return <Navigate to="/" />;
 }
 
-export default ProtectedRoute;
+console.log("🔍 ProtectedRoute → user.role:", user?.role);
+console.log("🔍 ProtectedRoute → rol requerido:", role);
+
+  // 🎉 Todo OK → Renderiza contenido
+  return children;
+}
