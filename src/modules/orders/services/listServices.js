@@ -9,11 +9,9 @@ export const listOrders = async () => {
 
   if (response.ok) {
     const data = await response.json();
-
     return { data, error: null };
   } else {
     const error = await response.json();
-
     return { data: null, error };
   }
 };
