@@ -30,6 +30,7 @@ export function AuthProvider({ children }) {
 
   const { token, error } = await loginService(username, password);
 
+
   if (error) return { error };
 
   // Decodificar token para obtener el rol y el usuario

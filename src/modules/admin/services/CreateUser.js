@@ -1,11 +1,10 @@
-// src/modules/admin/services/createUser.js
 import { instance } from "../../shared/api/axiosInstance";
 
 export const createUser = async (data) => {
   try {
-    // Si elige Admin → usamos register-admin
+    // ADMIN → usar endpoint correcto
     if (data.role === "Admin") {
-      const response = await instance.post("/auth/register-admin", {
+      const response = await instance.post("/api/Auth/register-admin", {
         username: data.username,
         email: data.email,
         password: data.password
@@ -14,8 +13,8 @@ export const createUser = async (data) => {
       return { ok: true, data: response.data };
     }
 
-    // Si elige Cliente → usamos register
-    const response = await instance.post("/auth/register", {
+    // CLIENTE → usar endpoint correcto
+    const response = await instance.post("/api/Auth/register", {
       username: data.username,
       email: data.email,
       phoneNumber: data.phoneNumber,
@@ -23,6 +22,7 @@ export const createUser = async (data) => {
     });
 
     return { ok: true, data: response.data };
+
   } catch (error) {
     return {
       ok: false,

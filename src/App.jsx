@@ -2,6 +2,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import CreateUserPage from "./modules/admin/pages/CreateUserPage.jsx";
 import { AuthProvider } from './modules/auth/context/AuthProvider';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
+import UserCreatedSuccess from "./modules/admin/pages/UserCreatedSuccess";
 
 // AUTH
 import LoginPage from './modules/auth/pages/LoginPage';
@@ -53,6 +54,7 @@ function App() {
         { path: "products/create", element: <CreateProductPage /> },
         { path: "orders", element: <ListOrdersPage /> },
         { path: 'create-user', element: <CreateUserPage /> },
+        { path: "user-created", element: <UserCreatedSuccess /> },
 
       ],
     },

@@ -1,107 +1,155 @@
-// src/modules/admin/pages/CreateUserPage.jsx
 import { useForm } from "react-hook-form";
-import { createUser } from "../services/CreateUser.js";
+import { createUser } from "../services/CreateUser";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function CreateUserPage() {
-  const { register, handleSubmit, reset } = useForm();
-  const [message, setMessage] = useState("");
-  const [type, setType] = useState(""); // success | error
+export default function CreateUserPage() {
+  const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset
+  } = useForm();
+
+  const roleSelected = watch("role");
 
   const onSubmit = async (data) => {
-    const response = await createUser(data);
+    const result = await createUser(data);
 
-    if (!response.ok) {
-      setType("error");
-      setMessage(
-        response.error?.message ||
-          response.error ||
-          "Error al crear usuario"
-      );
-      return;
+    if (result.ok) {
+      setSuccess(true);   // ← Mostrar pantalla de éxito
+      reset();            // Limpiar formulario
+    } else {
+      alert("Error: " + JSON.stringify(result.error));
     }
-
-    setType("success");
-    setMessage("Usuario creado exitosamente");
-
-    reset(); // limpia el formulario
   };
 
+  // -------------------
+  //    ⚡ PANTALLA ÉXITO
+  // -------------------
+  if (success) {
+    return (
+      <div className="flex justify-center w-full mt-10">
+        <div className="bg-white shadow-xl p-10 rounded-xl w-full max-w-xl text-center border border-gray-200">
+
+          <h2 className="text-2xl font-bold mb-6 text-green-600">
+            ✅ Usuario creado con éxito
+          </h2>
+
+          <p className="text-gray-600 mb-8">
+            El usuario ha sido registrado correctamente.
+          </p>
+
+          <div className="flex flex-col gap-4">
+
+            <button
+              className="bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
+              onClick={() => setSuccess(false)}
+            >
+              Crear otro usuario
+            </button>
+
+            <button
+              className="bg-gray-200 py-2 rounded hover:bg-gray-300 transition"
+              onClick={() => navigate("/admin/home")}
+            >
+              Volver al Panel
+            </button>
+
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------
+  //    ⚡ FORMULARIO
+  // -------------------
   return (
-    <div className="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-md">
-      <h1 className="text-2xl font-bold mb-6 text-center">
-        Crear Usuario
-      </h1>
+    <div className="flex justify-center w-full mt-10">
+      <div className="bg-white shadow-xl p-10 rounded-xl w-full max-w-2xl border border-gray-200">
 
-      {message && (
-        <div
-          className={`p-3 mb-4 text-white rounded ${
-            type === "success" ? "bg-green-500" : "bg-red-500"
-          }`}
-        >
-          {message}
-        </div>
-      )}
+        <h2 className="text-2xl text-center font-bold mb-8">Crear Usuario</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        {/* Usuario */}
-        <div>
-          <label className="font-medium">Usuario:</label>
-          <input
-            {...register("username", { required: true })}
-            className="w-full p-2 border rounded"
-          />
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
 
-        {/* Email */}
-        <div>
-          <label className="font-medium">Email:</label>
-          <input
-            {...register("email", { required: true })}
-            type="email"
-            className="w-full p-2 border rounded"
-          />
-        </div>
+          {/* Usuario */}
+          <div>
+            <label className="font-medium">Usuario:</label>
+            <input
+              className="border p-2 rounded w-full"
+              {...register("username", { required: "El usuario es obligatorio" })}
+            />
+            {errors.username && (
+              <p className="text-red-500 text-sm">{errors.username.message}</p>
+            )}
+          </div>
 
-        {/* Contraseña */}
-        <div>
-          <label className="font-medium">Contraseña:</label>
-          <input
-            {...register("password", { required: true })}
-            type="password"
-            className="w-full p-2 border rounded"
-          />
-        </div>
+          {/* Email */}
+          <div>
+            <label className="font-medium">Email:</label>
+            <input
+              className="border p-2 rounded w-full"
+              {...register("email", { required: "El email es obligatorio" })}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
+          </div>
 
-        {/* Teléfono (solo para cliente) */}
-        <div>
-          <label className="font-medium">Teléfono (solo cliente):</label>
-          <input
-            {...register("phoneNumber")}
-            type="text"
-            className="w-full p-2 border rounded"
-          />
-        </div>
+          {/* Contraseña */}
+          <div>
+            <label className="font-medium">Contraseña:</label>
+            <input
+              type="password"
+              className="border p-2 rounded w-full"
+              {...register("password", { required: "La contraseña es obligatoria" })}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
+          </div>
 
-        {/* Selector de Rol */}
-        <div>
-          <label className="font-medium">Rol:</label>
-          <select {...register("role", { required: true })} className="w-full p-2 border rounded">
-            <option value="">Seleccione un rol</option>
-            <option value="Client">Cliente</option>
-            <option value="Admin">Administrador</option>
-          </select>
-        </div>
+          {/* Teléfono (solo cliente) */}
+          {roleSelected === "User" && (
+            <div>
+              <label className="font-medium">Teléfono (solo cliente):</label>
+              <input
+                className="border p-2 rounded w-full"
+                {...register("phoneNumber")}
+              />
+            </div>
+          )}
 
-        <button
-          type="submit"
-          className="bg-purple-600 text-white p-2 rounded hover:bg-purple-700 transition"
-        >
-          Crear Usuario
-        </button>
-      </form>
+          {/* Rol */}
+          <div>
+            <label className="font-medium">Rol:</label>
+            <select
+              className="border p-2 rounded w-full"
+              {...register("role", { required: "Debe seleccionar un rol" })}
+            >
+              <option value="">Seleccione un rol</option>
+              <option value="Admin">Administrador</option>
+              <option value="User">Cliente</option>
+            </select>
+            {errors.role && (
+              <p className="text-red-500 text-sm">{errors.role.message}</p>
+            )}
+          </div>
+
+          {/* Botón */}
+          <button
+            className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
+            type="submit"
+          >
+            Crear Usuario
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
-
-export default CreateUserPage;
