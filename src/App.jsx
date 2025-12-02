@@ -1,50 +1,45 @@
+// src/App.jsx
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
-import CreateUserPage from "./modules/admin/pages/CreateUserPage.jsx";
-import { AuthProvider } from './modules/auth/context/AuthProvider';
-import ProtectedRoute from './modules/auth/components/ProtectedRoute';
-import UserCreatedSuccess from "./modules/admin/pages/UserCreatedSuccess";
+
+import { AuthProvider } from "./modules/auth/context/AuthProvider";
 
 // AUTH
-import LoginPage from './modules/auth/pages/LoginPage';
+import LoginPage from "./modules/auth/pages/LoginPage";
 import SignupPage from "./modules/auth/pages/SignupPage";
 
-// ADMIN LAYOUT
-import DashboardLayout from './modules/admin/components/DashboardLayout';
+// CLIENT
+import ClientHome from "./modules/home/pages/Home";
+import CartPage from "./modules/cart/pages/CartPage";
 
-// ADMIN PAGES
+// ADMIN
+import ProtectedRoute from "./modules/auth/components/ProtectedRoute";
+import DashboardLayout from "./modules/admin/components/DashboardLayout";
 import HomeAdmin from "./modules/admin/pages/HomeAdmin";
-import ListProductsPage from './modules/products/pages/ListProductsPage';
-import CreateProductPage from './modules/products/pages/CreateProductPage';
-import ListOrdersPage from './modules/orders/pages/ListOrdersPage';
-
-// CLIENT PAGES
-import ClientHome from './modules/home/pages/Home';
-import CartPage from './modules/cart/pages/CartPage';
+import ListProductsPage from "./modules/products/pages/ListProductsPage";
+import CreateProductPage from "./modules/products/pages/CreateProductPage";
+import ListOrdersPage from "./modules/orders/pages/ListOrdersPage";
+import CreateUserPage from "./modules/admin/pages/CreateUserPage";
+import UserCreatedSuccess from "./modules/admin/pages/UserCreatedSuccess";
 
 function App() {
+
   const router = createBrowserRouter([
-    //---------------------------------------------------------
-    // CLIENTE / PÚBLICO
-    //---------------------------------------------------------
     {
-      path: '/',
+      path: "/",
       element: <Outlet />,
       children: [
-        { path: '/', element: <ClientHome /> },
-        { path: '/cart', element: <CartPage /> },
+        { path: "/", element: <ClientHome /> },
+        { path: "/cart", element: <CartPage /> },
       ],
     },
 
-    { path: "/signup", element: <SignupPage /> }, // solo cliente
     { path: "/login", element: <LoginPage /> },
+    { path: "/signup", element: <SignupPage /> },
 
-    //---------------------------------------------------------
-    // ADMIN (PROTEGIDO POR ROL)
-    //---------------------------------------------------------
     {
       path: "/admin",
       element: (
-        <ProtectedRoute role="Admin">
+        <ProtectedRoute role="admin">
           <DashboardLayout />
         </ProtectedRoute>
       ),
@@ -53,9 +48,8 @@ function App() {
         { path: "products", element: <ListProductsPage /> },
         { path: "products/create", element: <CreateProductPage /> },
         { path: "orders", element: <ListOrdersPage /> },
-        { path: 'create-user', element: <CreateUserPage /> },
+        { path: "create-user", element: <CreateUserPage /> },
         { path: "user-created", element: <UserCreatedSuccess /> },
-
       ],
     },
   ]);
@@ -68,3 +62,4 @@ function App() {
 }
 
 export default App;
+
