@@ -1,11 +1,8 @@
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
-import CreateUserPage from "./modules/admin/pages/CreateUserPage.jsx";
+
+// AUTH / CONTEXT
 import { AuthProvider } from './modules/auth/context/AuthProvider';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
-import ProductDetailPage from './modules/products/pages/ProductDetailPage';
-
-
-// AUTH
 import LoginPage from './modules/auth/pages/LoginPage';
 import SignupPage from "./modules/auth/pages/SignupPage";
 
@@ -16,8 +13,11 @@ import DashboardLayout from './modules/admin/components/DashboardLayout';
 import HomeAdmin from "./modules/admin/pages/HomeAdmin";
 import ListProductsPage from './modules/products/pages/ListProductsPage';
 import CreateProductPage from './modules/products/pages/CreateProductPage';
+import ProductDetailPage from './modules/products/pages/ProductDetailPage';
 import ListOrdersPage from './modules/orders/pages/ListOrdersPage';
 import OrderDetailPage from './modules/orders/pages/OrderDetailPage';
+import CreateUserPage from "./modules/admin/pages/CreateUserPage.jsx";
+import UserCreatedSuccess from "./modules/admin/pages/UserCreatedSuccess";
 
 // CLIENT PAGES
 import ClientHome from './modules/home/pages/Home';
@@ -56,9 +56,9 @@ function App() {
         { path: "products/create", element: <CreateProductPage /> },
         { path: "products/:id", element: <ProductDetailPage /> },
         { path: "orders", element: <ListOrdersPage /> },
-        { path: "orders/:id", element: <OrderDetailPage /> }, 
-        { path: 'create-user', element: <CreateUserPage /> },
-        
+        { path: "orders/:id", element: <OrderDetailPage /> },
+        { path: "create-user", element: <CreateUserPage /> },
+        { path: "user-created", element: <UserCreatedSuccess /> },
       ],
     },
   ]);
@@ -71,3 +71,5 @@ function App() {
 }
 
 export default App;
+
+
