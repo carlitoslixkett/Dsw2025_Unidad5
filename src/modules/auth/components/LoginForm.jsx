@@ -1,88 +1,91 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import Input from '../../shared/components/Input';
-import Button from '../../shared/components/Button';
-import useAuth from '../hook/useAuth';
-import { frontendErrorMessage } from '../helpers/backendError';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 
 function LoginForm() {
-  const [errorMessage, setErrorMessage] = useState('');
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({ defaultValues: { username: '', password: '' } });
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
+  const { signin } = useAuth();
   const navigate = useNavigate();
 
-const { signin } = useAuth();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const onValid = async (formData) => {
-    console.log("Enviando datos:", formData.username, formData.password);
-    try {
-      const { error } = await signin(formData.username, formData.password);
-      console.log("signin ejecutado");
+    // Validaciones
+    if (!username.trim()) {
+      setErrorMsg("El usuario es obligatorio");
+      return;
+    }
 
-      if (error) {
-        setErrorMessage(error.frontendErrorMessage);
+    if (!password.trim()) {
+      setErrorMsg("La contraseña es obligatoria");
+      return;
+    }
 
-        return;
-      }
-console.log("🔹 Login ok, entrando como:", formData.username);
+    // Login
+    const { error } = await signin(username, password);
 
-      navigate('/admin/home');
-    } catch (error) {
-      if (error?.response?.data?.code) {
-        setErrorMessage(frontendErrorMessage[error?.response?.data?.code]);
-      } else {
-        setErrorMessage('Llame a soporte');
-      }
+    if (error) {
+      setErrorMsg("Usuario o contraseña incorrectos");
+      return;
+    }
+
+    // Recuperamos datos del usuario recién guardados
+    const savedUser = JSON.parse(localStorage.getItem("user"));
+
+    // 🔥 Redirección según su rol
+    if (savedUser?.role === "admin") {
+      navigate("/admin/home");
+    } else {
+      navigate("/");
     }
   };
 
   return (
-    <form className='
-        flex
-        flex-col
-        gap-20
-        bg-white
-        p-8
-        sm:w-md
-        sm:gap-4
-        sm:rounded-lg
-        sm:shadow-lg
-      '
-    onSubmit={handleSubmit(onValid)}
-    >
-      <Input
-        label='Usuario'
-        { ...register('username', {
-          required: 'Usuario es obligatorio',
-        }) }
-        error={errors.username?.message}
-      />
-      <Input
-        label='Contraseña'
-        { ...register('password', {
-          required: 'Contraseña es obligatorio',
-        }) }
-        type='password'
-        error={errors.password?.message}
-      />
+    <form onSubmit={handleSubmit} className="space-y-3">
 
-      <Button type='submit'>Iniciar Sesión</Button>
-<Button
-  variant="secondary"
-  type="button"
-  onClick={() => navigate("/signup")}
->
-  Registrar Usuario
-</Button>
+      <div>
+        <label className="font-medium">Usuario:</label>
+        <input
+          type="text"
+          className="w-full border rounded px-3 py-2 bg-blue-50"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
 
-      {errorMessage && <p className='text-red-500'>{errorMessage}</p>}
+      <div>
+        <label className="font-medium">Contraseña:</label>
+        <input
+          type="password"
+          className="w-full border rounded px-3 py-2"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      {errorMsg && (
+        <p className="text-red-500 text-sm">{errorMsg}</p>
+      )}
+
+      <button
+        type="submit"
+        className="w-full bg-purple-400 hover:bg-purple-500 text-white py-2 rounded"
+      >
+        Iniciar Sesión
+      </button>
+
+      <button
+        type="button"
+        onClick={() => navigate("/signup")}
+        className="w-full bg-gray-200 hover:bg-gray-300 py-2 rounded"
+      >
+        Registrar Usuario
+      </button>
     </form>
   );
-};
+}
 
 export default LoginForm;

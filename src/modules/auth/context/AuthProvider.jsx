@@ -1,74 +1,91 @@
 // src/modules/auth/context/AuthProvider.jsx
 import { jwtDecode } from "jwt-decode";
-
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useContext } from "react";
 import { login as loginService } from "../services/login";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // guarda {id, username, role}
+  const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // 🔄 RESTAURAR SESIÓN AL INICIAR
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+  // Cargar sesión guardada
+  // Cargar sesión guardada SOLO si el token es válido
+useEffect(() => {
+  const savedToken = localStorage.getItem("token");
+  const savedUser = localStorage.getItem("user");
 
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-      setIsAuthenticated(true);
+  if (savedToken && savedUser) {
+    try {
+      const decoded = jwtDecode(savedToken);
+      const now = Date.now() / 1000;
+
+      // Validar expiración del token
+      if (decoded.exp && decoded.exp > now) {
+        setToken(savedToken);
+        setUser(JSON.parse(savedUser));
+        setIsAuthenticated(true);
+      } else {
+        // Token expirado → limpiar todo
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
+    } catch (err) {
+      // Token corrupto o inválido → limpiar
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     }
+  }
 
-    setLoading(false);
-  }, []);
+  setLoading(false);
+}, []);
 
-  const signin = async (username, password) => {
-
+  // LOGIN
+ const signin = async (username, password) => {
   const { token, error } = await loginService(username, password);
-
-
   if (error) return { error };
 
-  // Decodificar token para obtener el rol y el usuario
-const decoded = jwtDecode(token);
+  // 🔥 DECODIFICAR EL JWT
+  const decoded = jwtDecode(token);
 
-const role =
-  decoded["role"] ||
-  decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+  console.log("DEBUG FULL TOKEN DECODED =>", decoded);
 
-const userName =
-  decoded["sub"] ||
-  decoded["name"] ||
-  decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+  // 🔥 CAPTURAR EL ROL DESDE EL CLAIM REAL
+  const possibleRole =
+    decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+    decoded["role"] ||
+    decoded["Role"] ||
+    decoded["roles"];
 
-const userData = {
-  username: userName,
-  role: role?.toLowerCase(),  // 🔥 NORMALIZAMOS EL ROL SIEMPRE
-};
+  // 🔥 CAPTURAR EL USUARIO
+  const possibleUser =
+    decoded["sub"] ||
+    decoded["name"] ||
+    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
 
+  const userData = {
+    username: possibleUser,
+    role: possibleRole?.toLowerCase(), // "Admin" -> "admin"
+  };
 
-  // Guardar token + usuario en localStorage
+  console.log("ROL DETECTADO:", possibleRole);
+  console.log("ROL NORMALIZADO:", userData.role);
+
+  // GUARDAR
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(userData));
 
-  // Guardar en estado global
   setToken(token);
   setUser(userData);
   setIsAuthenticated(true);
-
-console.log("🔹 Token recibido:", token);
-console.log("🔹 Decoded:", decoded);
-console.log("🔹 Rol procesado:", role?.toLowerCase());
 
   return { error: null };
 };
 
 
-  // 🔓 LOGOUT
+  // LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -92,6 +109,8 @@ console.log("🔹 Rol procesado:", role?.toLowerCase());
       {!loading && children}
     </AuthContext.Provider>
   );
+}
 
-  
+export function useAuth() {
+  return useContext(AuthContext);
 }

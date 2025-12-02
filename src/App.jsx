@@ -1,8 +1,9 @@
+// src/App.jsx
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 
 // AUTH / CONTEXT
 import { AuthProvider } from './modules/auth/context/AuthProvider';
-import ProtectedRoute from './modules/auth/components/ProtectedRoute';
+import ProtectedRoute from './modules/auth/components/ProtectedRoute'; // Se repite en Admin, pero lo dejamos aquí con Auth
 import LoginPage from './modules/auth/pages/LoginPage';
 import SignupPage from "./modules/auth/pages/SignupPage";
 
@@ -13,9 +14,9 @@ import DashboardLayout from './modules/admin/components/DashboardLayout';
 import HomeAdmin from "./modules/admin/pages/HomeAdmin";
 import ListProductsPage from './modules/products/pages/ListProductsPage';
 import CreateProductPage from './modules/products/pages/CreateProductPage';
-import ProductDetailPage from './modules/products/pages/ProductDetailPage';
+import ProductDetailPage from './modules/products/pages/ProductDetailPage'; // Agregada en Current
 import ListOrdersPage from './modules/orders/pages/ListOrdersPage';
-import OrderDetailPage from './modules/orders/pages/OrderDetailPage';
+import OrderDetailPage from './modules/orders/pages/OrderDetailPage'; // Agregada en Current
 import CreateUserPage from "./modules/admin/pages/CreateUserPage.jsx";
 import UserCreatedSuccess from "./modules/admin/pages/UserCreatedSuccess";
 
@@ -37,7 +38,7 @@ function App() {
       ],
     },
 
-    { path: "/signup", element: <SignupPage /> }, // solo cliente
+    { path: "/signup", element: <SignupPage /> }, // Solo estaba en Current (derecha)
     { path: "/login", element: <LoginPage /> },
 
     //---------------------------------------------------------
@@ -46,7 +47,7 @@ function App() {
     {
       path: "/admin",
       element: (
-        <ProtectedRoute role="Admin">
+        <ProtectedRoute role="admin"> {/* Usamos 'admin' de Incoming, ya que el casing ('Admin' vs 'admin') podría importar */}
           <DashboardLayout />
         </ProtectedRoute>
       ),
@@ -54,9 +55,9 @@ function App() {
         { path: "home", element: <HomeAdmin /> },
         { path: "products", element: <ListProductsPage /> },
         { path: "products/create", element: <CreateProductPage /> },
-        { path: "products/:id", element: <ProductDetailPage /> },
+        { path: "products/:id", element: <ProductDetailPage /> }, // Agregada en Current
         { path: "orders", element: <ListOrdersPage /> },
-        { path: "orders/:id", element: <OrderDetailPage /> },
+        { path: "orders/:id", element: <OrderDetailPage /> }, // Agregada en Current
         { path: "create-user", element: <CreateUserPage /> },
         { path: "user-created", element: <UserCreatedSuccess /> },
       ],
@@ -71,5 +72,3 @@ function App() {
 }
 
 export default App;
-
-
