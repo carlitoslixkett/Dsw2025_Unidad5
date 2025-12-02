@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+
 function ClientHeader() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,7 +43,7 @@ function ClientHeader() {
           </Link>
 
           <Link to="/login" className="hover:text-purple-600">
-            Iniciar Sesión
+            Cerrar sesion
           </Link>
         </div>
       </div>

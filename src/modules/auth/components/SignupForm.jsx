@@ -1,107 +1,162 @@
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { register as registerService } from "../services/register";
-import Input from "../../shared/components/Input";
-import Button from "../../shared/components/Button";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { instance } from "../../shared/api/axiosInstance";
 
 function SignupForm() {
-  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm({
-   defaultValues: {
-  username: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-  phoneNumber: ""  // <-- AGREGAR ESTE
-},
-
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: ""
   });
 
-  const onSubmit = async (formData) => {
-    const { error } = await registerService(formData);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-    if (error) {
-      setErrorMessage(error.message || "Error al registrarse");
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (form.password !== form.confirmPassword) {
+      setError("Las contraseñas no coinciden.");
       return;
     }
 
-    // Registro exitoso
-    navigate("/login");
+    try {
+      await instance.post("/api/Auth/register", {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        phoneNumber: form.phoneNumber,
+      });
+
+      // Mensaje de éxito
+      setSuccess("Cuenta creada con éxito. ");
+
+      // Redirección automática
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
+    } catch (err) {
+      console.error(err);
+
+      // Si el backend manda un mensaje claro
+      const msg = err.response?.data?.message;
+
+      if (msg?.includes("exists") || msg?.includes("exist")) {
+        setError("El nombre de usuario ya está en uso.");
+      }
+      else if (msg) {
+        setError(msg);
+      } 
+      else {
+        setError("Error al registrar usuario.");
+      }
+    }
   };
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-      {/* Usuario */}
-      <Input
-        label="Usuario"
-        {...register("username", { required: "Campo obligatorio" })}
-        error={errors.username?.message}
-      />
+    <form onSubmit={handleSubmit} className="space-y-4">
 
-      {/* Email */}
-      <Input
-        label="Email"
-        {...register("email", {
-          required: "Campo obligatorio",
-          pattern: {
-            value: /\S+@\S+\.\S+/,
-            message: "Email inválido",
-          },
-        })}
-        error={errors.email?.message}
-      />
-
-      {/* Contraseña */}
-      <Input
-        label="Contraseña"
-        type="password"
-        {...register("password", { required: "Campo obligatorio" })}
-        error={errors.password?.message}
-      />
-
-      {/* Confirmación */}
-      <Input
-        label="Confirmar Contraseña"
-        type="password"
-        {...register("confirmPassword", {
-          required: "Campo obligatorio",
-          validate: (value) =>
-            value === watch("password") || "Las contraseñas no coinciden",
-        })}
-        error={errors.confirmPassword?.message}
-      />
-
-      {/* Botón */}
-      <Button type="submit">Crear Cuenta</Button>
-
-      {/* Error */}
-      {errorMessage && (
-        <p className="text-red-500 text-center">{errorMessage}</p>
+      {/* Mensajes */}
+      {error && (
+        <p className="text-red-600 font-medium text-center">{error}</p>
       )}
 
-      <Button
-        variant="secondary"
-        onClick={() => navigate("/login")}
-        type="button"
-      >
-        Volver al inicio
-      </Button>
+      {success && (
+        <p className="text-green-600 font-medium text-center">{success}</p>
+      )}
+
+      {/* Usuario */}
+      <div>
+        <label className="block font-medium mb-1">Usuario:</label>
+        <input
+          name="username"
+          className="w-full px-3 py-2 border rounded-md bg-gray-100"
+          value={form.username}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      {/* Email */}
+      <div>
+        <label className="block font-medium mb-1">Email:</label>
+        <input
+          name="email"
+          type="email"
+          className="w-full px-3 py-2 border rounded-md bg-gray-100"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      {/* Contraseña */}
+      <div>
+        <label className="block font-medium mb-1">Contraseña:</label>
+        <input
+          name="password"
+          type="password"
+          className="w-full px-3 py-2 border rounded-md bg-gray-100"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      {/* Confirmar */}
+      <div>
+        <label className="block font-medium mb-1">Confirmar contraseña:</label>
+        <input
+          name="confirmPassword"
+          type="password"
+          className="w-full px-3 py-2 border rounded-md bg-gray-100"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          required
+        />
+      </div>
 
       {/* Teléfono */}
-<Input
-  label="Teléfono"
-  {...register("phoneNumber", { required: "Campo obligatorio" })}
-  error={errors.phoneNumber?.message}
-/>
+      <div>
+        <label className="block font-medium mb-1">Teléfono:</label>
+        <input
+          name="phoneNumber"
+          className="w-full px-3 py-2 border rounded-md bg-gray-100"
+          value={form.phoneNumber}
+          onChange={handleChange}
+          required
+        />
+      </div>
 
+      {/* Botones */}
+      <button
+        type="submit"
+        className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition"
+      >
+        Crear Cuenta
+      </button>
+
+      <button
+        type="button"
+        onClick={() => navigate("/login")}
+        className="w-full bg-gray-200 py-2 rounded-md hover:bg-gray-300 transition"
+      >
+        Volver al inicio
+      </button>
     </form>
   );
 }
