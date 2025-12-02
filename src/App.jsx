@@ -23,6 +23,9 @@ import UserCreatedSuccess from "./modules/admin/pages/UserCreatedSuccess";
 // CLIENT PAGES
 import ClientHome from './modules/home/pages/Home';
 import CartPage from './modules/cart/pages/CartPage';
+import ProfilePage from './modules/home/pages/ProfilePage';       
+import ClientOrdersPage from './modules/home/pages/ClientOrdersPage'
+import ClientOrderDetailPage from './modules/home/pages/ClientOrderDetailPage';
 
 function App() {
   const router = createBrowserRouter([
@@ -35,6 +38,9 @@ function App() {
       children: [
         { path: '/', element: <ClientHome /> },
         { path: '/cart', element: <CartPage /> },
+        { path: '/profile', element: <ProfilePage /> },
+        { path: '/orders', element: <ClientOrdersPage /> }, //  Mis pedidos
+        { path: '/orders/:id', element: <ClientOrderDetailPage /> },
       ],
     },
 
@@ -60,6 +66,7 @@ function App() {
         { path: "orders/:id", element: <OrderDetailPage /> }, // Agregada en Current
         { path: "create-user", element: <CreateUserPage /> },
         { path: "user-created", element: <UserCreatedSuccess /> },
+        
       ],
     },
   ]);
