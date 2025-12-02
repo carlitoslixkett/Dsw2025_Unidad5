@@ -10,9 +10,9 @@ function ClientHeader() {
   const [openMenu, setOpenMenu] = useState(false);
 
   const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  logout();
+ };
+
 
   return (
     <header className="w-full bg-white shadow-sm py-3 mb-4">
