@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Card from "../../shared/components/Card";
 import { listOrders } from "../services/listServices";
+import { useNavigate } from "react-router-dom"; 
 
 // Traduce el código numérico de estado a texto
 const getStatusText = (status) => {
@@ -39,6 +40,9 @@ function ListOrdersPage() {
   useEffect(() => {
     loadOrders();
   }, []);
+
+  const navigate = useNavigate();
+
 
   const loadOrders = async () => {
     try {
@@ -174,15 +178,13 @@ function ListOrdersPage() {
               </div>
 
               <button
-                type="button"
-                className="px-4 py-2 rounded-lg bg-purple-200 border border-purple-300 text-sm font-medium"
-                onClick={() => {
-                  console.log("Ver orden", order.id);
-                  // más adelante podés navegar a /admin/orders/:id
-                }}
+               type="button"
+               className="px-4 py-2 rounded-lg bg-purple-200 border border-purple-300 text-sm font-medium"
+               onClick={() => navigate(`/admin/orders/${order.id}`)}
               >
-                Ver
-              </button>
+               Ver
+               </button>
+
             </div>
           ))}
       </div>

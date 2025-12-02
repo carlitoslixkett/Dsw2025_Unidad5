@@ -2,6 +2,8 @@ import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import CreateUserPage from "./modules/admin/pages/CreateUserPage.jsx";
 import { AuthProvider } from './modules/auth/context/AuthProvider';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
+import ProductDetailPage from './modules/products/pages/ProductDetailPage';
+
 
 // AUTH
 import LoginPage from './modules/auth/pages/LoginPage';
@@ -15,6 +17,7 @@ import HomeAdmin from "./modules/admin/pages/HomeAdmin";
 import ListProductsPage from './modules/products/pages/ListProductsPage';
 import CreateProductPage from './modules/products/pages/CreateProductPage';
 import ListOrdersPage from './modules/orders/pages/ListOrdersPage';
+import OrderDetailPage from './modules/orders/pages/OrderDetailPage';
 
 // CLIENT PAGES
 import ClientHome from './modules/home/pages/Home';
@@ -51,9 +54,11 @@ function App() {
         { path: "home", element: <HomeAdmin /> },
         { path: "products", element: <ListProductsPage /> },
         { path: "products/create", element: <CreateProductPage /> },
+        { path: "products/:id", element: <ProductDetailPage /> },
         { path: "orders", element: <ListOrdersPage /> },
+        { path: "orders/:id", element: <OrderDetailPage /> }, 
         { path: 'create-user', element: <CreateUserPage /> },
-
+        
       ],
     },
   ]);
