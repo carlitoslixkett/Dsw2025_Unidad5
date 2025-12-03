@@ -40,3 +40,14 @@ export const getProductById = async (id) => {
   // el back devuelve un único producto (ResponseProductModel)
   return { data: response.data, error: null };
 };
+
+//ruta para editar producto
+export const updateProduct = (id, payload) => {
+  // PUT /api/products/{id}
+  return instance.put(`/api/products/${id}`, payload);
+};
+
+export const toggleProductStatus = (id) => {
+  return instance.patch(`/api/products/${id}`);
+};
+

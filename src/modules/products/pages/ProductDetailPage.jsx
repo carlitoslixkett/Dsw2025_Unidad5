@@ -49,7 +49,10 @@ function ProductDetailPage() {
     );
   }
 
-  const statusText = product.isActive ? "Activado" : "Desactivado";
+    const statusText = product.isActive ? "Activado" : "Desactivado";
+
+  const handleBack = () => navigate(-1);
+  const handleEdit = () => navigate(`/admin/products/${id}/edit`);
 
   return (
     <Card>
@@ -58,14 +61,25 @@ function ProductDetailPage() {
           {product.sku} - {product.name}
         </h1>
 
-        <button
-          type="button"
-          className="px-4 py-2 rounded-lg border"
-          onClick={() => navigate(-1)}
-        >
-          ← Volver
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="px-4 py-2 rounded-lg border"
+            onClick={handleBack}
+          >
+            ← Volver
+          </button>
+
+          <button
+            type="button"
+            className="px-4 py-2 rounded-lg border bg-purple-500 text-white"
+            onClick={handleEdit}
+          >
+            Editar producto
+          </button>
+        </div>
       </div>
+
 
       <p className="mb-2">
         <span className="font-semibold">Código interno:</span>{" "}

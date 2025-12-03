@@ -19,6 +19,7 @@ import ListOrdersPage from './modules/orders/pages/ListOrdersPage';
 import OrderDetailPage from './modules/orders/pages/OrderDetailPage'; // Agregada en Current
 import CreateUserPage from "./modules/admin/pages/CreateUserPage.jsx";
 import UserCreatedSuccess from "./modules/admin/pages/UserCreatedSuccess";
+import EditProductPage from './modules/products/pages/EditProductPage';
 
 // CLIENT PAGES
 import ClientHome from './modules/home/pages/Home';
@@ -64,6 +65,7 @@ function App() {
         { path: "products", element: <ListProductsPage /> },
         { path: "products/create", element: <CreateProductPage /> },
         { path: "products/:id", element: <ProductDetailPage /> }, // Agregada en Current
+        { path: "products/:id/edit", element: <EditProductPage /> },
         { path: "orders", element: <ListOrdersPage /> },
         { path: "orders/:id", element: <OrderDetailPage /> }, // Agregada en Current
         { path: "create-user", element: <CreateUserPage /> },
