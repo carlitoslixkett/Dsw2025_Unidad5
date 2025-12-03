@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import ClientHeader from "../../shared/components/ClientHeader";
+import { useNavigate } from "react-router-dom";
 
 function CartPage() {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -112,8 +114,9 @@ function CartPage() {
               </h2>
 
               <button
-                className="mt-3 bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-500"
-              >
+                 onClick={() => navigate("/checkout")}
+                 className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+    >
                 Finalizar compra
               </button>
             </div>

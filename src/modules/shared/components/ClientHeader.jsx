@@ -67,15 +67,7 @@ function ClientHeader() {
               {openMenu && (
                 <div className="absolute right-0 mt-2 bg-white shadow-lg border rounded-md w-40 py-2 animate-fade">
                   
-                  <button
-                    onClick={() => {
-                      setOpenMenu(false);
-                      navigate("/profile");
-                    }}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                  >
-                    Mi Cuenta
-                  </button>
+
 
                   <button
                     onClick={() => {
@@ -84,7 +76,7 @@ function ClientHeader() {
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
-                    Mis pedidos
+                    Mis Pedidos
                   </button>
 
                   <button

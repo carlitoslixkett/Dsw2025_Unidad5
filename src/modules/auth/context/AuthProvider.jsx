@@ -42,38 +42,35 @@ useEffect(() => {
   setLoading(false);
 }, []);
 
-  // LOGIN
- const signin = async (username, password) => {
+const signin = async (username, password) => {
   const { token, error } = await loginService(username, password);
   if (error) return { error };
 
-  // 🔥 DECODIFICAR EL JWT
   const decoded = jwtDecode(token);
+  console.log("TOKEN DECODIFICADO =>", decoded);
 
-  console.log("DEBUG FULL TOKEN DECODED =>", decoded);
-
-  // 🔥 CAPTURAR EL ROL DESDE EL CLAIM REAL
   const possibleRole =
     decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
     decoded["role"] ||
     decoded["Role"] ||
     decoded["roles"];
 
-  // 🔥 CAPTURAR EL USUARIO
   const possibleUser =
     decoded["sub"] ||
     decoded["name"] ||
     decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
 
+  const userId =
+    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+    decoded["nameid"] ||
+    decoded["sub"];
+
   const userData = {
+    id: userId,           // 👈 NECESARIO PARA CUSTOMERID
     username: possibleUser,
-    role: possibleRole?.toLowerCase(), // "Admin" -> "admin"
+    role: possibleRole?.toLowerCase(),
   };
 
-  console.log("ROL DETECTADO:", possibleRole);
-  console.log("ROL NORMALIZADO:", userData.role);
-
-  // GUARDAR
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(userData));
 
@@ -83,6 +80,7 @@ useEffect(() => {
 
   return { error: null };
 };
+
 
 
   // LOGOUT

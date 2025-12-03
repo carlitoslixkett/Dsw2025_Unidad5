@@ -26,6 +26,7 @@ import CartPage from './modules/cart/pages/CartPage';
 import ProfilePage from './modules/home/pages/ProfilePage';       
 import ClientOrdersPage from './modules/home/pages/ClientOrdersPage'
 import ClientOrderDetailPage from './modules/home/pages/ClientOrderDetailPage';
+import CheckoutPage from "./modules/cart/pages/CheckoutPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -41,6 +42,7 @@ function App() {
         { path: '/profile', element: <ProfilePage /> },
         { path: '/orders', element: <ClientOrdersPage /> }, //  Mis pedidos
         { path: '/orders/:id', element: <ClientOrderDetailPage /> },
+        { path: "/checkout", element: <CheckoutPage />,}     
       ],
     },
 
