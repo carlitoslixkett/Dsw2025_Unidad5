@@ -127,12 +127,7 @@ function ListOrdersPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          <button
-            type="button"
-            className="px-4 py-2 rounded bg-purple-200 border border-purple-300"
-          >
-            🔍
-          </button>
+
 
           <select
             className="border rounded px-3 py-2 min-w-[160px]"

@@ -150,13 +150,7 @@ useEffect(() => {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          {/* botón lupa (solo decorativo) */}
-          <button
-            type="button"
-            className="px-4 py-2 rounded bg-purple-200 border border-purple-300"
-          >
-            🔍
-          </button>
+
 
           {/* combo Estado de producto */}
           <select

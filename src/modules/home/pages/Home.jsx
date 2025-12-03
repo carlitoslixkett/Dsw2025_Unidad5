@@ -39,7 +39,7 @@ function Home() {
     };
 
     fetchProducts();
-  }, [page, searchTerm]);// 👈 IMPORTANTE: actualizar en cada cambio de página
+  }, [page, searchTerm]);// IMPORTANTE: actualizar en cada cambio de página
 
   // Carrito
   const addToCart = (product) => {
@@ -107,7 +107,7 @@ function Home() {
                     : "bg-white hover:bg-gray-100"
                 }`}
               >
-                ◀ Anterior
+                Anterior
               </button>
 
               <span className="text-gray-700">
@@ -123,7 +123,7 @@ function Home() {
                     : "bg-white hover:bg-gray-100"
                 }`}
               >
-                Siguiente ▶
+                Siguiente
               </button>
             </div>
           </>
