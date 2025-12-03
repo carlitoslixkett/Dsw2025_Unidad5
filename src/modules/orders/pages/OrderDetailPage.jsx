@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom"; 
 import Card from "../../shared/components/Card";
 import { getOrderById } from "../services/listServices";
+import { instance } from "../../shared/api/axiosInstance";
+
 
 const getStatusText = (status) => {
   if (status === 0) return "Pendiente";
@@ -17,6 +19,36 @@ function OrderDetailPage() {
   const navigate = useNavigate(); 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+
+const statusMap = {
+  0: "Pendiente",
+  1: "Procesando",
+  2: "Enviado",
+  3: "Entregado",
+  4: "Cancelado",
+};
+
+const handleUpdateStatus = async () => {
+  try {
+
+    // Convertimos el número a string, porque el backend lo espera como STRING
+    const payload = { newStatus: order.status.toString() };
+
+    console.log("Payload enviado:", payload);
+
+    await instance.put(`/api/orders/${order.id}/status`, payload);
+
+    alert("Estado actualizado con éxito");
+
+  } catch (err) {
+    console.error("Error al actualizar estado:", err);
+    alert("Error al actualizar estado");
+  }
+};
+
+
+
+
 
   useEffect(() => {
     loadOrder();
@@ -52,6 +84,30 @@ function OrderDetailPage() {
         <p><strong>ID:</strong> {order.id}</p>
         <p><strong>Cliente:</strong> {order.customerName}</p>
         <p><strong>Estado:</strong> {getStatusText(order.status)}</p>
+        {/* --- CAMBIO DE ESTADO --- */}
+<div className="mt-3 p-3 border rounded bg-gray-50">
+  <label className="font-medium block mb-1">Cambiar estado:</label>
+
+  <select
+    className="border px-3 py-2 rounded w-full"
+    value={order.status}
+    onChange={(e) => setOrder({ ...order, status: Number(e.target.value) })}
+  >
+    <option value={0}>Pendiente</option>
+    <option value={1}>Procesando</option>
+    <option value={2}>Enviado</option>
+    <option value={3}>Entregado</option>
+    <option value={4}>Cancelado</option>
+  </select>
+
+  <button
+    onClick={handleUpdateStatus}
+    className="mt-3 w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700"
+  >
+    Guardar estado
+  </button>
+</div>
+
         <p><strong>Dirección Envío:</strong> {order.shippingAddress}</p>
         <p><strong>Dirección Facturación:</strong> {order.billingAddress}</p>
         <p><strong>Fecha:</strong> {new Date(order.date).toLocaleString()}</p>
