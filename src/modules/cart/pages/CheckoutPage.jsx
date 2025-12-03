@@ -2,29 +2,44 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { instance } from "../../shared/api/axiosInstance";
 import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../../auth/context/AuthProvider";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
 
   const [shippingAddress, setShippingAddress] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
   const [cart, setCart] = useState([]);
 
-  // Cargar carrito
+  // 🔥 VALIDACIÓN DE LOGIN + CARGAR CARRITO
   useEffect(() => {
+    if (isAuthenticated === false) {
+      alert("Debes estar logueado para completar la compra.");
+      navigate("/login");
+      return;
+    }
+
+    // Cargar carrito desde localStorage
     const stored = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(stored);
-  }, []);
+
+  }, [isAuthenticated]); // 👈 OBLIGATORIO
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para finalizar la compra.");
+      return navigate("/login");
+    }
 
     if (cart.length === 0) {
       alert("Tu carrito está vacío");
       return;
     }
 
-    // OBTENER EL ID REAL DESDE EL TOKEN
+    // OBTENER ID DEL USUARIO DESDE EL TOKEN
     const token = localStorage.getItem("token");
     const decoded = jwtDecode(token);
 
@@ -33,7 +48,6 @@ export default function CheckoutPage() {
 
     console.log("Customer ID usado:", customerId);
 
-    // Preparar orderItems
     const orderItems = cart.map((item) => ({
       quantity: item.quantity,
       productId: item.id,
@@ -50,7 +64,6 @@ export default function CheckoutPage() {
 
     try {
       const response = await instance.post("/api/orders", payload);
-
       console.log("Orden creada:", response.data);
 
       localStorage.removeItem("cart");

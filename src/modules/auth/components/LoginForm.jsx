@@ -35,7 +35,7 @@ function LoginForm() {
     // Recuperamos datos del usuario recién guardados
     const savedUser = JSON.parse(localStorage.getItem("user"));
 
-    // 🔥 Redirección según su rol
+    //  Redirección según rol
     if (savedUser?.role === "admin") {
       navigate("/admin/home");
     } else {

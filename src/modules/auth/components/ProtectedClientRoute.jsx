@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthProvider";
 function ProtectedClientRoute({ children }) {
   const { user } = useAuth();
 
-  // Si NO hay usuario → fuera
+  // Si NO hay usuario lo deja fuera
   if (!user) {
     return <Navigate to="/login" />;
   }
