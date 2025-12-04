@@ -50,21 +50,30 @@ function SignupForm() {
       }, 1500);
 
     } catch (err) {
-      console.error(err);
+      console.error("ERROR REGISTRO:", err);
 
-      // Si el backend manda un mensaje claro
-      const msg = err.response?.data?.message;
+      // PRIORIDAD 1: mensaje directo en "detail"
+      const detail = err.response?.data?.detail;
 
-      if (msg?.includes("exists") || msg?.includes("exist")) {
-        setError("El nombre de usuario ya está en uso.");
+      // PRIORIDAD 2: errores del modelo de Identity (array)
+      const identityErrors = err.response?.data?.errors;
+      let identityMessage = "";
+
+      if (identityErrors && typeof identityErrors === "object") {
+        identityMessage = Object.values(identityErrors)
+          .flat()
+          .join(" ");
       }
-      else if (msg) {
-        setError(msg);
-      } 
-      else {
-        setError("Error al registrar usuario.");
-      }
+
+      // PRIORIDAD 3: fallback
+      const fallback = "Error al registrar usuario. Verifica los datos ingresados.";
+
+      // Elegimos el mensaje más útil
+      const finalMessage = detail || identityMessage || fallback;
+
+      setError(finalMessage);
     }
+
   };
 
   return (

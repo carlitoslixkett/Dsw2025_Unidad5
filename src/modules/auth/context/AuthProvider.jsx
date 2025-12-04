@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
     };
   };
 
-  // 🔄 Cargar sesión guardada SOLO si el token es válido
+  // Cargar sesión guardada SOLO si el token es válido
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
 
@@ -79,7 +79,7 @@ export function AuthProvider({ children }) {
     const { token, error } = await loginService(username, password);
     if (error) return { error };
 
-    // 👇 usamos la misma función para construir el user
+    // usamos la misma función para construir el user
     const userData = buildUserFromToken(token);
 
     localStorage.setItem("token", token);

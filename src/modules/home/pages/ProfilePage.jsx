@@ -50,12 +50,12 @@ function ProfilePage() {
               <span className="font-semibold">Email:</span>{" "}
               {user.email || "No disponible"}
             </p>
-            {user.role && (
+           {/* {user.role && (
               <p>
                 <span className="font-semibold">Rol:</span>{" "}
                 {user.role}
               </p>
-            )}
+            )}*/}
           </div>
 
           <hr />
