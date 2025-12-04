@@ -5,7 +5,7 @@ export default function HomeAdmin() {
   const navigate = useNavigate();
 
   return (
-    <div className="p-6">
+    <div className="p-6 w-full">
       <h1 className="text-2xl font-bold mb-6">Panel de Administración</h1>
 
       <div className="grid sm:grid-cols-3 gap-6">
@@ -41,3 +41,4 @@ export default function HomeAdmin() {
     </div>
   );
 }
+

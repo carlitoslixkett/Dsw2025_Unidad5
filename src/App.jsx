@@ -28,6 +28,7 @@ import ProfilePage from './modules/home/pages/ProfilePage';
 import ClientOrdersPage from './modules/home/pages/ClientOrdersPage'
 import ClientOrderDetailPage from './modules/home/pages/ClientOrderDetailPage';
 import CheckoutPage from "./modules/cart/pages/CheckoutPage";
+import ClientProductDetailPage from './modules/home/pages/ClientProductDetailPage';
 
 function App() {
   const router = createBrowserRouter([
@@ -39,6 +40,7 @@ function App() {
       element: <Outlet />,
       children: [
         { path: '/', element: <ClientHome /> },
+        { path: '/products/:id', element: <ClientProductDetailPage /> },
         { path: '/cart', element: <CartPage /> },
         { path: '/profile', element: <ProfilePage /> },
         { path: '/orders', element: <ClientOrdersPage /> }, //  Mis pedidos

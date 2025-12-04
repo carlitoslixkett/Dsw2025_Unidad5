@@ -51,6 +51,10 @@ function ProductDetailPage() {
 
     const statusText = product.isActive ? "Activado" : "Desactivado";
 
+
+  const handleBack2 = () => {
+  navigate("/admin/products");   // o la ruta que quieras fija
+  };
   const handleBack = () => navigate(-1);
   const handleEdit = () => navigate(`/admin/products/${id}/edit`);
 
@@ -65,7 +69,7 @@ function ProductDetailPage() {
           <button
             type="button"
             className="px-4 py-2 rounded-lg border"
-            onClick={handleBack}
+            onClick={handleBack2}
           >
             ← Volver
           </button>

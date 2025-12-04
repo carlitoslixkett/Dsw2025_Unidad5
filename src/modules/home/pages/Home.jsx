@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ClientHeader from "../../shared/components/ClientHeader";
 import { instance } from "../../shared/api/axiosInstance";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -13,6 +13,12 @@ function Home() {
   const [searchParams] = useSearchParams();
   const searchTerm = searchParams.get("search") || "";
 
+  const navigate = useNavigate();
+
+const goToDetail = (id) => {
+  navigate(`/products/${id}`);
+};
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -20,9 +26,8 @@ function Home() {
         setError("");
 
         const response = await instance.get(
-        `/api/products?pageNumber=${page}&pageSize=${pageSize}&search=${searchTerm}`
-  );
-
+          `/api/products?pageNumber=${page}&pageSize=${pageSize}&search=${searchTerm}`
+        );
 
         if (response.status === 204) {
           setProducts([]);
@@ -39,10 +44,15 @@ function Home() {
     };
 
     fetchProducts();
-  }, [page, searchTerm]);// IMPORTANTE: actualizar en cada cambio de página
+  }, [page, searchTerm]); // IMPORTANTE: actualizar en cada cambio de página
 
   // Carrito
   const addToCart = (product) => {
+    // seguridad extra por si llega algo sin stock
+    if (product.stockQuantity === 0) {
+      return;
+    }
+
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const existing = cart.find((item) => item.id === product.id);
 
@@ -69,34 +79,66 @@ function Home() {
 
         {loading && <p>Cargando productos...</p>}
         {!loading && error && <p className="text-red-600">{error}</p>}
-        {!loading && !error && products.length === 0 && (
+
+        {/* No hay resultados PERO sí hay un término de búsqueda */}
+        {!loading && !error && products.length === 0 && searchTerm && (
+          <p className="text-red-600">
+            No se encontraron productos que coincidan con:{" "}
+            <strong>{searchTerm}</strong>
+          </p>
+        )}
+
+        {/* No hay productos y NO se está buscando nada */}
+        {!loading && !error && products.length === 0 && !searchTerm && (
           <p>No hay productos disponibles.</p>
         )}
 
         {/* GRID DE PRODUCTOS */}
         {!loading && !error && products.length > 0 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {products.map((p) => (
-                <div
-                  key={p.id}
-                  className="bg-white shadow-sm p-4 rounded-lg border hover:shadow-md transition"
-                >
-                  <div className="h-32 bg-gray-200 rounded mb-3" />
-                  <h2 className="text-lg font-medium">{p.name}</h2>
-                  <p className="text-gray-600 mb-3">$ {p.currentUnitPrice}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {products.map((p) => {
+            const hasStock = (p.stockQuantity ?? 0) > 0;
 
+            return (
+              <div
+                key={p.id}
+                onClick={() => goToDetail(p.id)}
+                className="bg-white shadow-sm p-4 rounded-lg border hover:shadow-md transition cursor-pointer"
+              >
+                <div className="h-32 bg-gray-200 rounded mb-3" />
+                <h2 className="text-lg font-medium">{p.name}</h2>
+                <p className="text-gray-600">$ {p.currentUnitPrice}</p>
+                <p className="text-sm text-gray-500 mb-3">
+                 {/* Stock: {p.stockQuantity}*/}
+                </p>
+
+                {hasStock ? (
                   <button
-                    onClick={() => addToCart(p)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // 🛑 que no dispare el click de la card
+                      addToCart(p);
+                    }}
                     className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-500"
                   >
                     Agregar al carrito
                   </button>
-                </div>
-              ))}
-            </div>
+                ) : (
+                  <button
+                    disabled
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full bg-gray-200 text-gray-500 py-2 rounded-md cursor-not-allowed"
+                  >
+                    Sin stock
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
-            {/* ⭐ PAGINACIÓN — FUERA DEL MAP */}
+
+            {/*  PAGINACIÓN — FUERA DEL MAP */}
             <div className="flex items-center justify-center gap-4 mt-6">
               <button
                 disabled={page === 1}

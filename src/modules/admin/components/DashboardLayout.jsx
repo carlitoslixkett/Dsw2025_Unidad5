@@ -7,7 +7,6 @@ import Header from "./Header";
 function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Evita que el body se mueva cuando el sidebar móvil está abierto
   useEffect(() => {
     if (isSidebarOpen) {
       document.body.style.overflow = "hidden";
@@ -17,15 +16,13 @@ function DashboardLayout() {
   }, [isSidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-
+    <div className="min-h-screen bg-gray-100 flex overflow-x-hidden">
       {/* SIDEBAR */}
       <aside
         className={`
           fixed inset-y-0 left-0 z-30 
-          w-64 bg-white shadow-xl
+          w-64 bg-white border-r shadow-xl
           transform transition-transform duration-300 ease-in-out
-
           lg:translate-x-0 lg:static lg:shadow-none
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
@@ -35,7 +32,7 @@ function DashboardLayout() {
         </div>
       </aside>
 
-      {/* OVERLAY EN MOBILE */}
+      {/* OVERLAY MOBILE */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/50 lg:hidden"
@@ -44,14 +41,15 @@ function DashboardLayout() {
       )}
 
       {/* CONTENIDO PRINCIPAL */}
-      <div className="flex flex-col flex-1 lg:ml-64 min-h-screen">
-
-        {/* HEADER (botón hamburguesa) */}
+      {/* 👇 OJO: acá le sacamos el lg:ml-64 */}
+      <div className="flex flex-col flex-1 min-h-screen">
         <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-        {/* CONTENIDO DE LAS RUTAS */}
-        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto">
-          <Outlet />
+        <main className="flex-1 px-6 py-6 overflow-auto">
+          {/* usamos TODO el ancho disponible */}
+          <div className="w-full">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
@@ -59,3 +57,5 @@ function DashboardLayout() {
 }
 
 export default DashboardLayout;
+
+

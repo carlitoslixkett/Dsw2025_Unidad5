@@ -11,79 +11,87 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Cargar sesión guardada
-  // Cargar sesión guardada SOLO si el token es válido
-useEffect(() => {
-  const savedToken = localStorage.getItem("token");
-  const savedUser = localStorage.getItem("user");
+  // 👉 Función reutilizable para armar userData desde un token
+  const buildUserFromToken = (jwt) => {
+    const decoded = jwtDecode(jwt);
+    console.log("TOKEN DECODIFICADO =>", decoded);
 
-  if (savedToken && savedUser) {
-    try {
-      const decoded = jwtDecode(savedToken);
-      const now = Date.now() / 1000;
+    const possibleRole =
+      decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+      decoded["role"] ||
+      decoded["Role"] ||
+      decoded["roles"];
 
-      // Validar expiración del token
-      if (decoded.exp && decoded.exp > now) {
-        setToken(savedToken);
-        setUser(JSON.parse(savedUser));
-        setIsAuthenticated(true);
-      } else {
-        // Token expirado → limpiar todo
+    const possibleUser =
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] ||
+      decoded["name"] ||
+      decoded["sub"];
+
+    const possibleEmail =
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
+
+    const userId =
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+      decoded["nameid"] ||
+      decoded["sub"];
+
+    return {
+      id: userId,
+      username: possibleUser,
+      role: possibleRole?.toLowerCase(),
+      email: possibleEmail || "No disponible",
+    };
+  };
+
+  // 🔄 Cargar sesión guardada SOLO si el token es válido
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+
+    if (savedToken) {
+      try {
+        const decoded = jwtDecode(savedToken);
+        const now = Date.now() / 1000;
+
+        // Validar expiración del token
+        if (decoded.exp && decoded.exp > now) {
+          const userData = buildUserFromToken(savedToken);
+
+          setToken(savedToken);
+          setUser(userData);
+          setIsAuthenticated(true);
+
+          // opcional: actualizar "user" en localStorage con el nuevo formato
+          localStorage.setItem("user", JSON.stringify(userData));
+        } else {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
+      } catch (err) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
-    } catch (err) {
-      // Token corrupto o inválido → limpiar
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
     }
-  }
 
-  setLoading(false);
-}, []);
+    setLoading(false);
+  }, []);
 
-const signin = async (username, password) => {
-  const { token, error } = await loginService(username, password);
-  if (error) return { error };
+  const signin = async (username, password) => {
+    const { token, error } = await loginService(username, password);
+    if (error) return { error };
 
-  const decoded = jwtDecode(token);
-  console.log("TOKEN DECODIFICADO =>", decoded);
+    // 👇 usamos la misma función para construir el user
+    const userData = buildUserFromToken(token);
 
-  const possibleRole =
-    decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
-    decoded["role"] ||
-    decoded["Role"] ||
-    decoded["roles"];
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
 
-  const possibleUser =
-    decoded["sub"] ||
-    decoded["name"] ||
-    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+    setToken(token);
+    setUser(userData);
+    setIsAuthenticated(true);
 
-  const userId =
-    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
-    decoded["nameid"] ||
-    decoded["sub"];
-
-  const userData = {
-    id: userId,           // 👈 NECESARIO PARA CUSTOMERID
-    username: possibleUser,
-    role: possibleRole?.toLowerCase(),
+    return { error: null };
   };
 
-  localStorage.setItem("token", token);
-  localStorage.setItem("user", JSON.stringify(userData));
-
-  setToken(token);
-  setUser(userData);
-  setIsAuthenticated(true);
-
-  return { error: null };
-};
-
-
-
-  // LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -95,20 +103,14 @@ const signin = async (username, password) => {
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isAuthenticated,
-        loading,
-        signin,
-        logout,
-      }}
+      value={{ user, token, isAuthenticated, loading, signin, logout }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }
 
+// Custom hook
 export function useAuth() {
   return useContext(AuthContext);
 }

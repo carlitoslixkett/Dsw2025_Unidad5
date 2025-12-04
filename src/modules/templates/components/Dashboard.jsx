@@ -74,7 +74,7 @@ function Dashboard() {
           bottom-0
           bg-white
           w-64
-          p-6
+          p-3 sm:p-4 md:p-5
           ${openMenu ? 'left-0' : 'left-[-256px]'}
           rounded
           shadow
@@ -86,6 +86,7 @@ function Dashboard() {
           sm:left-0
         `}
       >
+
         <nav>
           <ul
             className='flex flex-col'
@@ -113,14 +114,10 @@ function Dashboard() {
         </nav>
         {renderLogoutButton(true)}
       </aside>
-      <main
-        className="
-          p-5
-          overflow-y-scroll
-        "
-      >
+<main className="p-4 overflow-y-auto w-full max-w-full">
         <Outlet />
       </main>
+
     </div>
   );
 };
